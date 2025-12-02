@@ -1,12 +1,13 @@
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.interval import IntervalTrigger
+
+from .predictions_model.predict import run_hourly_sentiment
 
 # ROUTERS
 from .routes import model
-from .predictions_model.predict import run_hourly_sentiment
 
 app = FastAPI(
     title="NLP API",
@@ -31,10 +32,10 @@ app.include_router(model.router, prefix="/model", tags=["model"])
 def start_scheduler():
     scheduler.add_job(
         run_hourly_sentiment,
-        trigger=IntervalTrigger(minutes=2),
+        trigger=IntervalTrigger(hours=1),
         kwargs={"count": 100},
         id="sentiment_job",
-        replace_existing=True
+        replace_existing=True,
     )
 
     scheduler.start()
