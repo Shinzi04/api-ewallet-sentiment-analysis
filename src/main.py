@@ -15,7 +15,6 @@ app = FastAPI(
     version="1.0.0",
 )
 
-scheduler = BackgroundScheduler()
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,9 +24,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(model.router, prefix="/model", tags=["model"])
+app.include_router(model.router, prefix="/sentiment", tags=["sentiment"])
+@app.get("/")
+async def root():
+    return RedirectResponse(url="/docs")
 
 
+scheduler = BackgroundScheduler()
 @app.on_event("startup")
 def start_scheduler():
     scheduler.add_job(
@@ -37,17 +40,9 @@ def start_scheduler():
         id="sentiment_job",
         replace_existing=True,
     )
-
     scheduler.start()
-    print(">> Scheduler started! Job will run every 2 minutes.")
-
 
 @app.on_event("shutdown")
 def shutdown_scheduler():
     scheduler.shutdown()
-    print(">> Scheduler shut down.")
 
-
-@app.get("/")
-async def root():
-    return RedirectResponse(url="/docs")

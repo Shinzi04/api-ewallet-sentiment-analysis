@@ -60,9 +60,9 @@ class PlayStoreScraper:
         for i in range(1, 6):
             print(f"  Rating {i}: {rating_counts.get(i, 0)}")
 
-    def run(self, count=100):
+    def run(self, count=100, save=False):
         self.fetch_reviews(count)
         self.filter_reviews()
         self.save()
-        self.print_rating_counts()
+        # self.print_rating_counts()
         print(f"\nCompleted on {datetime.now():%Y-%m-%d %H:%M:%S}")

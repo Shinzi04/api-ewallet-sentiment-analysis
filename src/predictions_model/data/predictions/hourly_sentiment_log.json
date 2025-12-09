@@ -1,0 +1,71 @@
+[
+  {
+    "timestamp": "2025-12-09T10:46:54",
+    "summary": [
+      {
+        "brand": "DANA",
+        "negatif": 24.0,
+        "neutral": 12.0,
+        "positif": 64.0
+      },
+      {
+        "brand": "GoPay",
+        "negatif": 21.0,
+        "neutral": 8.0,
+        "positif": 71.0
+      },
+      {
+        "brand": "OVO",
+        "negatif": 50.0,
+        "neutral": 18.0,
+        "positif": 32.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-12-09T10:47:54",
+    "summary": [
+      {
+        "brand": "DANA",
+        "negatif": 24.0,
+        "neutral": 12.0,
+        "positif": 64.0
+      },
+      {
+        "brand": "GoPay",
+        "negatif": 21.0,
+        "neutral": 8.0,
+        "positif": 71.0
+      },
+      {
+        "brand": "OVO",
+        "negatif": 50.0,
+        "neutral": 18.0,
+        "positif": 32.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-12-09T10:48:54",
+    "summary": [
+      {
+        "brand": "DANA",
+        "negatif": 24.0,
+        "neutral": 12.0,
+        "positif": 64.0
+      },
+      {
+        "brand": "GoPay",
+        "negatif": 21.0,
+        "neutral": 8.0,
+        "positif": 71.0
+      },
+      {
+        "brand": "OVO",
+        "negatif": 50.0,
+        "neutral": 18.0,
+        "positif": 32.0
+      }
+    ]
+  }
+]

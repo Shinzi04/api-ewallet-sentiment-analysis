@@ -2,6 +2,7 @@ import json
 import os
 import pickle
 import re
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -15,9 +16,10 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from .utils.scraper import PlayStoreScraper
 
 # ========== PATH CONFIG ==========
-BASE_DIR = Path(__file__).resolve().parent              # .../src/predictions_model
+BASE_DIR = Path(__file__).resolve().parent  # .../src/predictions_model
 ARTIFACTS_PATH = BASE_DIR / "artifacts"
 DATA_PATH = BASE_DIR / "data"
+LOG_PATH = DATA_PATH / "predictions" / "hourly_sentiment_log.json"
 MODEL_PATH = ARTIFACTS_PATH / "model.h5"
 
 # ========== LOAD MODEL & ARTIFACTS ==========
@@ -109,14 +111,12 @@ def load_reviews_from_json(path: Path):
     return texts, scores
 
 
-from datetime import datetime
-
 def run_hourly_sentiment(count: int = 100):
     now = datetime.now().isoformat(timespec="seconds")
     print(f"[run_hourly_sentiment] START at {now}, count={count}")
 
-    ovo_fetcher = PlayStoreScraper("ovo.id",    save_dir=DATA_PATH)
-    dana_fetcher = PlayStoreScraper("id.dana",  save_dir=DATA_PATH)
+    ovo_fetcher = PlayStoreScraper("ovo.id", save_dir=DATA_PATH)
+    dana_fetcher = PlayStoreScraper("id.dana", save_dir=DATA_PATH)
     gopay_fetcher = PlayStoreScraper("com.gojek.gopay", save_dir=DATA_PATH)
 
     REVIEWS_COUNT = count
@@ -168,6 +168,7 @@ def run_hourly_sentiment(count: int = 100):
     summary.to_csv(summary_path)
 
     summary_reset = summary.reset_index()
+    append_hourly_log(summary_reset)
 
     done = datetime.now().isoformat(timespec="seconds")
     print(f"[run_hourly_sentiment] DONE at {done}")
@@ -192,3 +193,49 @@ def load_latest_summary():
         df = df.reset_index()
 
     return df.to_dict(orient="records")
+
+
+def append_hourly_log(summary_df: pd.DataFrame):
+    out_dir = DATA_PATH / "predictions"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    log_path = LOG_PATH
+
+    entry = {
+        "timestamp": datetime.now().isoformat(timespec="seconds"),
+        "summary": summary_df.to_dict(orient="records"),
+    }
+
+    try:
+        if log_path.exists():
+            with log_path.open("r", encoding="utf-8") as f:
+                log_data = json.load(f)
+            if not isinstance(log_data, list):
+                log_data = []
+        else:
+            log_data = []
+    except Exception:
+        log_data = []
+
+    log_data.append(entry)
+
+    if len(log_data) > 24:
+        log_data = log_data[-24:]
+
+    with log_path.open("w", encoding="utf-8") as f:
+        json.dump(log_data, f, ensure_ascii=False, indent=2)
+
+
+def load_hourly_log():
+    log_path = LOG_PATH
+
+    if not log_path.exists():
+        raise FileNotFoundError(f"Hourly sentiment log not found at {log_path}")
+
+    with log_path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if not isinstance(data, list):
+        raise ValueError("Hourly sentiment log is in an unexpected format.")
+
+    return data
